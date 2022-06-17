@@ -152,7 +152,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <classifier>boot</classifier>
-<!--                    <finalName>EtechWebsite.war</finalName>-->
+                    <!--<finalName>EtechWebsite.war</finalName>-->
                 </configuration>
             </plugin>
             <plugin>
@@ -160,9 +160,17 @@
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <version>1.4.13</version>
                 <executions>
+                    <!--                    <execution>
+                        <id>default</id>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>push</goal>
+                        </goals>
+                    </execution>-->
                     <execution>
                         <id>default</id>
                         <goals>
+                            <!--<goal>repackage</goal>-->
                             <goal>build</goal>
                             <goal>push</goal>
                         </goals>
@@ -176,6 +184,36 @@
                     </buildArgs>
                 </configuration>
             </plugin>
+            
+            <!-- Set a JDK compiler level -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Make this jar executable -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- DO NOT include log4j.properties file in your Jar -->
+                    <excludes>
+                        <exclude>**/log4j.properties</exclude>
+                    </excludes>
+                    <archive>
+                        <manifest>
+                            <!-- Jar file entry point -->
+                            <mainClass>com.etech.etechwebsite.EtechWebsiteApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            
         </plugins>
     </build>
 

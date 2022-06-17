@@ -1,36 +1,33 @@
-# Glassfish container configured for Etech Website
+# GlassFish 3.1.2 and spring boot guide jar to war deployment
 #
-# VERSION  0.1
+# VERSION 0.1
+# DOCKER-VERSION 1.0.0
 
-# Grab compatible java
+FROM ubuntu:22.04
 FROM java:8-jdk-alpine
+#FROM dockerfile/java
 
-# Get latest version of glassfish server image 
-FROM glassfish:latest
-MAINTAINER Olouge Eya Ekolle
 
-# Update the base system and try installing curl
-# RUN apt-get update -y && \ 
+#RUN apt-get update -qq
+#RUN apt-get install -qq maven git
 
-RUN apt-get install curl -y
+# COPY etech-website /
 
-# Exposing necessary ports if they are closed
-EXPOSE      8088
-EXPOSE      4848
-EXPOSE      8181
-EXPOSE      3306
- 
-# Install Datasource dependencies and configure datasource in Glassfish
-RUN curl http://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.29/mysql-connector-java-8.0.29.jar -o glassfish/domains/domain1/lib/mysql-connector-java-8.0.29.jar 
+WORKDIR /
+COPY target/etech-website-0.0.1-SNAPSHOT.war .
+#Downloading and unpacking GlassFish 312
+COPY glassfish-3.1.2.2.zip .
+#RUN wget http://download.java.net/glassfish/3.1.2.2/release/glassfish-3.1.2.2.zip
+RUN unzip glassfish-3.1.2.2.zip
+RUN rm -f glassfish-3.1.2.2.zip
+ENV PATH /glassfish3/glassfish/bin:$PATH
+# RUN git clone https://github.com/spring-guides/gs-convert-jar-to-war-maven
+#Package the war file
+# WORKDIR /etech-website
 
-# COPY $GLASSFISH_HOME/lib/mysql-connector-java-8.0.29.jar $GLASSFISH_HOME/domains/domain1/lib/mysql-connector-java-8.0.29.jar
+# RUN ./mvnw clean package
 
-# Copy the war file to glassfish server to autodeploy
-COPY target/etech-website-0.0.1-SNAPSHOT.war glassfish/domains/domain1/autodeploy/etech-website-0.0.1-SNAPSHOT.war
-COPY target/etech-website-0.0.1-SNAPSHOT.war /
-COPY start.sh /
+RUN cp /etech-website-0.0.1-SNAPSHOT.war /glassfish3/glassfish/domains/domain1/autodeploy
 
-CMD cmod 777 /start.sh
-
-ENTRYPOINT ["/start.sh"]
-
+EXPOSE 8080 4848 8181
+WORKDIR /glassfish3/glassfish/domains/domain1/logs

@@ -1,0 +1,36 @@
+# Glassfish container configured for Etech Website
+#
+# VERSION  0.1
+
+# Grab compatible java
+FROM java:8-jdk-alpine
+
+# Get latest version of glassfish server image 
+FROM glassfish:latest
+MAINTAINER Olouge Eya Ekolle
+
+# Update the base system and try installing curl
+# RUN apt-get update -y && \ 
+
+RUN apt-get install curl -y
+
+# Exposing necessary ports if they are closed
+EXPOSE      8088
+EXPOSE      4848
+EXPOSE      8181
+EXPOSE      3306
+ 
+# Install Datasource dependencies and configure datasource in Glassfish
+RUN curl http://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.29/mysql-connector-java-8.0.29.jar -o glassfish/domains/domain1/lib/mysql-connector-java-8.0.29.jar 
+
+# COPY $GLASSFISH_HOME/lib/mysql-connector-java-8.0.29.jar $GLASSFISH_HOME/domains/domain1/lib/mysql-connector-java-8.0.29.jar
+
+# Copy the war file to glassfish server to autodeploy
+COPY target/etech-website-0.0.1-SNAPSHOT.war glassfish/domains/domain1/autodeploy/etech-website-0.0.1-SNAPSHOT.war
+COPY target/etech-website-0.0.1-SNAPSHOT.war /
+COPY start.sh /
+
+CMD cmod 777 /start.sh
+
+ENTRYPOINT ["/start.sh"]
+
